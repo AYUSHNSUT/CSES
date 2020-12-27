@@ -36,64 +36,8 @@ inline int ones(int n) { int res = 0; while(n && ++res) n-=n&(-n); return res; }
 template<class T> void chmax(T & a, const T & b) { a = max(a, b); }
 template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////
-
-bool valid (ll mid , vl &a, ll k)
-{
-    ll gc = 1;
-    ll currSum = 0;
-    for(int i = 0;i<a.size();i++){
-      if(a[i] > mid){
-        DEBUG(a[i]);
-        DEBUG(mid);
-        return false;
-      }
-      if(currSum + a[i] > mid)
-      {
-        gc++;
-        currSum = a[i];
-      }
-
-      else{
-        currSum += a[i];
-      }
-    }
-
-    DEBUG(gc);
-    if(gc <=k)
-    {
-      return true;
-    }
-    else return false;
-}
 void solve()
 {
-  ll n, k;
-  cin >> n >> k;
-
-  vl a(n);
-  REP(i,n){
-    cin >> a[i];
-  }
-  ll low = 1, hi = 1e18;
-
-  ll mid; ll ans = 0;
-  while(low <= hi){
-    mid = (low + hi) /2;
-    DEBUG(mid);
-    bool pos = valid(mid, a,k);
-  //  DEBUG(mid);
-    DEBUG(pos);
-    if(pos){
-      ans = mid;
-      hi = mid-1;
-    }
-    else
-    {
-      low = mid+1;
-    }
-  }
-
-  cout << ans << endl;
 
 }
 
@@ -102,7 +46,7 @@ int main()
 
     std::ios::sync_with_stdio(false);
     int t = 1;
-    //cin >> t;
+    cin >> t;
 
     while(t--)
       {

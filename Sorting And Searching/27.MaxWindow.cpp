@@ -37,72 +37,59 @@ template<class T> void chmax(T & a, const T & b) { a = max(a, b); }
 template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////
 
-bool valid (ll mid , vl &a, ll k)
-{
-    ll gc = 1;
-    ll currSum = 0;
-    for(int i = 0;i<a.size();i++){
-      if(a[i] > mid){
-        DEBUG(a[i]);
-        DEBUG(mid);
-        return false;
-      }
-      if(currSum + a[i] > mid)
-      {
-        gc++;
-        currSum = a[i];
-      }
 
-      else{
-        currSum += a[i];
-      }
-    }
-
-    DEBUG(gc);
-    if(gc <=k)
-    {
-      return true;
-    }
-    else return false;
-}
 void solve()
 {
-  ll n, k;
-  cin >> n >> k;
+  ll n ,a,b;
+  cin >> n >> a >> b;
 
-  vl a(n);
-  REP(i,n){
-    cin >> a[i];
+  vl c(n);
+  vl pre(n);
+  ll cumsum = 0;
+
+  REP(i, n){
+    cin >> c[i];
+    cumsum +=c[i];
+    pre[i] = cumsum;
   }
-  ll low = 1, hi = 1e18;
 
-  ll mid; ll ans = 0;
-  while(low <= hi){
-    mid = (low + hi) /2;
-    DEBUG(mid);
-    bool pos = valid(mid, a,k);
-  //  DEBUG(mid);
-    DEBUG(pos);
-    if(pos){
-      ans = mid;
-      hi = mid-1;
-    }
-    else
+  multiset <ll> s;
+  ll ans = pre[a-1];
+
+  for(int i = a-1;i<b;i++)
+  {
+    ans = max(ans, pre[i]);
+  }
+  for(int i = 0;i < n; i++)
+  {
+    // DEBUG(i);
+    // DEBUG(pre[i]);
+    if(i >= a)
+    s.insert(pre[i-a]);
+
+    // cout << "\n****STATUS OF SET ****\n";
+    // for(auto k : s)
+    // {
+    //   DEBUG(k);
+    // }
+    if(s.size())
+      ans = max(ans, pre[i] - *s.begin());
+    // DEBUG(ans);
+    if(i >=b )
     {
-      low = mid+1;
+      auto it = s.find(pre[i-b]);
+      s.erase(it);
     }
   }
 
   cout << ans << endl;
-
 }
-
 int main()
 {
 
     std::ios::sync_with_stdio(false);
     int t = 1;
-    //cin >> t;
+  // /  cin >> t;
 
     while(t--)
       {

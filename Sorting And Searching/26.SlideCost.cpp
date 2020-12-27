@@ -1,5 +1,7 @@
 #include<bits/stdc++.h>
-
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
 using namespace std;
 
 #define DEBUG(x) cerr << '>' << #x << ':' << x << endl;
@@ -35,66 +37,44 @@ inline int last_bit(int n) { return n & (-n); }
 inline int ones(int n) { int res = 0; while(n && ++res) n-=n&(-n); return res; }
 template<class T> void chmax(T & a, const T & b) { a = max(a, b); }
 template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
+
+  typedef tree<int, null_type, less_equal<int>, rb_tree_tag, tree_order_statistics_node_update> mst;
+
 /////////////////////////////////////////////////////////////////////
-
-bool valid (ll mid , vl &a, ll k)
-{
-    ll gc = 1;
-    ll currSum = 0;
-    for(int i = 0;i<a.size();i++){
-      if(a[i] > mid){
-        DEBUG(a[i]);
-        DEBUG(mid);
-        return false;
-      }
-      if(currSum + a[i] > mid)
-      {
-        gc++;
-        currSum = a[i];
-      }
-
-      else{
-        currSum += a[i];
-      }
-    }
-
-    DEBUG(gc);
-    if(gc <=k)
-    {
-      return true;
-    }
-    else return false;
-}
 void solve()
 {
-  ll n, k;
-  cin >> n >> k;
+  int n, k;
+      cin >> n >> k;
+      vi a(n);
+      for (int i = 0; i < n; i++) cin >> a[i];
+      mst s;
+      ll currcost = 0;
 
-  vl a(n);
-  REP(i,n){
-    cin >> a[i];
-  }
-  ll low = 1, hi = 1e18;
+      for (int i = 0; i < k; i++) s.insert(a[i]);
+       int med = *s.find_by_order((k + 1) / 2 - 1);
 
-  ll mid; ll ans = 0;
-  while(low <= hi){
-    mid = (low + hi) /2;
-    DEBUG(mid);
-    bool pos = valid(mid, a,k);
-  //  DEBUG(mid);
-    DEBUG(pos);
-    if(pos){
-      ans = mid;
-      hi = mid-1;
-    }
-    else
-    {
-      low = mid+1;
-    }
-  }
+        for(int i = 0;i<k;i++) currcost += abs(a[i] - med);
 
-  cout << ans << endl;
+      cout << currcost << " ";
 
+      for (int i = 0; i < n - k; i++) {
+          s.erase(s.find_by_order(s.order_of_key(a[i])));
+          s.insert(a[i+k]);
+
+          int newmed = *s.find_by_order((k+1) / 2 - 1);
+
+          currcost += abs(newmed - a[i+k]) - abs(med - a[i]);
+
+          if(!(k&1)){
+            currcost-= newmed - med;
+          }
+
+          med = newmed;
+
+          cout << currcost << " ";
+
+      }
+      cout << endl;
 }
 
 int main()
@@ -102,7 +82,7 @@ int main()
 
     std::ios::sync_with_stdio(false);
     int t = 1;
-    //cin >> t;
+  // /  cin >> t;
 
     while(t--)
       {
