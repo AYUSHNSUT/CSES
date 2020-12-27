@@ -36,36 +36,60 @@ inline int ones(int n) { int res = 0; while(n && ++res) n-=n&(-n); return res; }
 template<class T> void chmax(T & a, const T & b) { a = max(a, b); }
 template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////
+int dp[1000001];
+int findMinCoins(vi &a, int total){
+
+  if(total == 0 )
+  {
+    return 0;
+  }
+
+  if(total < 0)
+  {
+    return INT_MAX - 1;
+  }
+  if(dp[total] != -1)
+  {
+    return dp[total];
+  }
+
+  int tans = INT_MAX - 1;
+
+  for(int i = 0;i<a.size();i++)
+  {
+    tans = min(tans , findMinCoins(a,total - a[i]) + 1);
+  }
+  dp[total] = tans;
+  return dp[total];
+}
+
 void solve()
 {
-  int n;
-  cin >> n;
+  int n, total;
+  cin >> n >> total;
 
-  vector <ll> dp(n+6);
-  dp[0] = 1;
-  dp[1] = 1;
-  dp[2] = 2;
-  dp[3] = 4;
+  memset(dp, -1, sizeof(dp));
+  dp[0] = 0;
 
-  dp[4] = dp[0] + dp[1] + dp[2] + dp[3];
-  dp[5] = dp[0] + dp[1] + dp[2] + dp[3] + dp[4];
-  dp[6] = dp[0] + dp[1] + dp[2] + dp[3] + dp[4] + dp[5];
-
-  if(n<=6)
+  vi a(n);
+  REP(i,n)
   {
-    cout << dp[n] << endl;
-    return;
-  }
-  for(int i = 7;i<=n;i++)
-  {
-    for(int k = 1;k<=6;k++)
-    {
-      dp[i] += dp[i-k] % M;
-      dp[i] = dp[i] %M;
-    }
+    cin >> a[i];
   }
 
-  cout << dp[n] << endl;
+  for(int i = 0; i< n;i++ )
+  {
+    dp[a[i]] = 1;
+  }
+
+  int ans = findMinCoins(a, total);
+
+  if(ans >= INT_MAX-1)
+  {
+    ans = -1;
+  }
+
+  cout <<  ans << endl;
 }
 
 int main()
@@ -73,7 +97,7 @@ int main()
 
     std::ios::sync_with_stdio(false);
     int t = 1;
-    //cin >> t;
+//    cin >> t;
 
     while(t--)
       {
