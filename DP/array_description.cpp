@@ -34,95 +34,99 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
-
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
-
-
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
-
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
-
-void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
-
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
-    }
-    ll dp[1000005];
-
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
+int dp[100005][102];
+int m;
+//vector <int> ansaa(10);
+int find(vi &a, int x, int prev){
+    if(x==a.size()){
+        // for(auto k : ansaa){
+        //     cout << k << " ";
+        // }
+        // cout << endl;
+        return 1;
     }
 
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
+    if(prev != 0 && dp[x+1][prev] != -1){
+        return dp[x+1][prev];
     }
 
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
+    int iterans = 0;
 
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
+    if(prev == 0){
+        if(a[x] == 0){
+            for(int i = 1;i<=m;i++){
+              //  ansaa[x] = i;
+                iterans += find(a,x+1,i)%M;
+                iterans %=M;
             }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
+        }
+        else{
+          //  ansaa[x] = a[x];
+            iterans += find(a,x+1,a[x])%M;
+            iterans %=M;
+        }
+    }
+
+    else{
+
+        if(a[x] == 0){
+            if(prev > 1){
+             //   ansaa[x] = prev-1;
+                iterans += find(a, x+1,prev-1 );
+                iterans %=M;
+            }
+           
+          //  ansaa[x] = prev;
+            iterans += find(a, x+1,prev );
+            iterans %=M;
+
+            if(prev < m){
+           // ansaa[x] = prev+1;
+            iterans += find(a, x+1,prev+1 );
+            iterans %=M;
+
             }
             
         }
+        else if(abs(a[x] - prev) > 1){
+            return 0;
+        }
+        else{
+          //  ansaa[x] = a[x];
+            iterans += find(a,x+1, a[x]);
+            iterans %=M;
+        }
     }
 
-    cout << dp[n*n - 1]%M << endl;
+    dp[x+1][prev] = iterans %M;
+    return dp[x+1][prev];
+}
+
+void solve(){
+
+    int n;
+    cin >> n >> m;
+
+    vi a(n);
+    REP(i,n){
+        cin >> a[i];
+    }
+    int ans;
+
+    memset(dp ,-1 , sizeof(dp));
+    for(int i = 0;i<=n;i++){
+        dp[0][i] == 0;
+    }
+
+    for(int i = 0;i<=m;i++){
+        dp[0][m] == 0;
+    }
+    ans = find(a, 0 ,0);
+    
+
+    cout << ans %M;
+
+
 
 }
 
@@ -143,7 +147,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+//    cin >> t; 
    while(t--){
        solve();
    }

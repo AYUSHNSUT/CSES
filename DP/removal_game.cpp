@@ -34,96 +34,41 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
 
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
+ll dp[5002][5002];
+ll gameSolve(vi &a, int i , int j, int player){
+    if(i > j){
+        return 0;
+    }
 
+    if(dp[i][j]!=0){
+        return dp[i][j];
+    }
 
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
+    if(i == j){
+        dp[i][j] = a[i];
+        return dp[i][j];
+    }
 
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
+    ll ans1 = a[i] - gameSolve(a , i+1 , j , !player);
+    ll ans2 = a[j] - gameSolve(a , i, j-1 , !player) ;
+   
+    dp[i][j] = max(ans1, ans2);
+    return dp[i][j];    
+}
 
 void solve(){
-    ll n;
+    int n;
     cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
-
+    vector <int> a(n);
+    ll s = 0;
     REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
+        cin >> a[i];
+        s+=a[i];
     }
-    ll dp[1000005];
+     memset(dp , 0 , sizeof(dp));
 
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
-    }
-
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
-
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
-    }
-
-    cout << dp[n*n - 1]%M << endl;
-
+     cout << (gameSolve(a, 0 , n-1 , 0) + s) / 2  << endl;
 }
 
 

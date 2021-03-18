@@ -34,96 +34,54 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
 
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
+ll dp[5003][5003];
 
+int findEdit(string &a , string &b , int i , int j){
+   if(i == 0){
+       dp[i][j] = j;
+       return dp[i][j];
+   } 
 
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
+   if(j == 0){
+       dp[i][j] = i;
+       return dp[i][j];
+   } 
 
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
+   if(dp[i][j] != -1){
+       return dp[i][j];
+   }
 
-    
+   if(a[i-1]==b[j-1]){
+       dp[i][j] = findEdit(a,b,i-1,j-1);
+       return dp[i][j];
+   }
+   else{
+       int t1 = findEdit(a,b, i-1, j-1) + 1;
+      // DEBUG(t1);
+       int t2 = findEdit(a,b,i-1,j)+1;
+     //  DEBUG(t2);
+       int t3 = findEdit(a,b,i,j-1)+1;
+       //DEBUG(t3);
 
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
+       int ans = min(t1,t2);
+       ans = min(ans,t3);
 
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
+       dp[i][j] = ans;
+       return dp[i][j];
+   }
 
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
+//    /return dp[i][j];
+}
 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
+    string a , b;
+    cin >> a >> b;
 
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
-    }
-    ll dp[1000005];
-
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
-    }
-
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
-
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
-    }
-
-    cout << dp[n*n - 1]%M << endl;
-
+    dp[0][0] = 0;
+    memset(dp , -1 , sizeof(dp));
+    
+    cout << findEdit(a,b,a.size(), b.size()) << endl;
 }
 
 
@@ -143,7 +101,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   //cin >> t; 
    while(t--){
        solve();
    }

@@ -34,95 +34,52 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
+ll dp[502][125252];
 
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
-
-
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
-
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
+ll findSums(int n , ll s){
+    if( n<0 || s< 0){
+        return 0;
+    }
 
 
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
+    if(dp[n][s]!= -1){
+        return dp[n][s];
+    }
 
-//     return dp[n]%M;
-    
-// }
+    dp[n][s] = (findSums(n-1 , s - n)%M + findSums(n-1 , s)%M)%M;
+    // cerr << n << " " << s << endl;
+    // DEBUG(dp[n][s]);
+    return dp[n][s];
+}
 
 void solve(){
-    ll n;
+    int n;
     cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
+    vi a(n);
+    ll s = 0;
+    // REP(i,n){
+    //     cin >> a[i];
+    //     s+=a[i];
+    // }
 
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
-    }
-    ll dp[1000005];
-
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
+    s = n * (n+1);
+    s/=2;
+    if(s%2){
+        cout << 0 << endl;
+        return;
     }
 
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
+    memset(dp , -1 ,sizeof(dp));
+
+    for(int i = 1;i<= n;i++){
+        dp[i][0] = 1;
     }
 
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
+    for(int i = 0;i<=s;i++){
+        dp[0][i] = 0;
     }
 
-    cout << dp[n*n - 1]%M << endl;
+    cout <<  findSums(n , s/2)%M << endl;
 
 }
 

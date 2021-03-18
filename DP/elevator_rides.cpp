@@ -34,96 +34,64 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
-
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
 
 
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
+/*
 
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
+TODO:
+1. Iterate through all subsets
+2. Store , for each subset, the optimal number rides and the weight of last ride optimally.
+3. To add an element, there are two cases , we can either add the element to a previous ride
+    if the weight is not full or we can add it to new ride
+*/
 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
+    ll n , x;
+    cin >> n >> x;
+    vl wt(n) ;
 
     REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
-    }
-    ll dp[1000005];
-
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
+        cin >> wt[i];
     }
 
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
+    pair <int,int> dp[1 << n];
 
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
 
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
+    dp[0] = mp(0 , 0);
+
+    for(int m = 1;m< 1<<n;m++){
+        //DEBUG(m);
+        dp[m] = mp(n+1, 0);
+        for(int s = 0;s<n;s++){
+            if(m & (1 << s)){
+               // cerr << s << endl;
+              //  DEBUG(dp[m ^ (1<<s)].first);
+                pair <int,int> previousOptimalSolution = dp[m ^ (1<<s)];
+
+                if(previousOptimalSolution.second  + wt[s] <= x){
+                    previousOptimalSolution.second += wt[s];
+                }
+                else{
+                    previousOptimalSolution.second = wt[s];
+                    previousOptimalSolution.first++;
+                }
+              //  DEBUG(previousOptimalSolution.first);
+
+                dp[m] = min(dp[m], previousOptimalSolution);
             }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
+
         }
     }
 
-    cout << dp[n*n - 1]%M << endl;
+    // for(int i = 0;i< 1<<n;i++){
+    //      cout << "i = " << i << endl;
+    //      cout << dp[i].first << endl;
+    //      cout << dp[i].second << endl;
+         
+    // }
 
+    cout << dp[(1<<n)  -  1].first + 1 << "\n";
+  
 }
 
 
@@ -143,7 +111,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   //cin >> t; 
    while(t--){
        solve();
    }

@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
+//using namespace std::chrono; 
 #define DEBUG(x) cerr << '>' << #x << ':' << x << endl;
 #define REP(i,n) for(int i=0;i<(n);i++)
 #define FOR(i,a,b) for(int i=(a);i<=(b);i++)
@@ -28,123 +29,65 @@ inline int ones(int n) { int res = 0; while(n && ++res) n-=n&(-n); return res; }
 template<class T> void chmax(T & a, const T & b) { a = max(a, b); }
 template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 #define fast_cin() std::ios_base::sync_with_stdio(false); cin.tie(NULL); cout.tie(NULL)
-
-
+ 
+ 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
-
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
-
-
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
-
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
-
+int dp[1005][100005];
+ 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
-
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
+    int n , x;
+    cin >> n >> x;
+ 
+    vi a(n),b(n);
+    for(int i = 0;i<n;i++){
+        cin >> a[i];
     }
-    ll dp[1000005];
-
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
+ 
+    for(int i = 0;i<n;i++){
+        cin >> b[i];
     }
-
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
-
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
+    for(int i = 1;i<=n;i++){
+        for(int wt = 0;wt<=x;wt++){
+            dp[i][wt] = dp[i-1][wt];
+            if(a[i-1] <= wt){
+                dp[i][wt] = max(dp[i][wt], dp[i-1][wt - a[i-1]] + b[i-1]);
             }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
         }
     }
 
-    cout << dp[n*n - 1]%M << endl;
 
+    //  for(int i = 0;i<=x;i++){
+    //     DEBUG(i);
+    //     DEBUG(dp[i]);
+    // }
+ 
+    cout << dp[n][x] << "\n";
 }
-
-
-
+ 
+ 
+ 
 int main(){
-
-
-
+  //  auto start = high_resolution_clock::now(); 
     #ifdef mishrable
     // for getting input from input.txt
     freopen("input.txt", "r", stdin);
     // for writing output to output.txt
     freopen("output.txt", "w", stdout);
     #endif
-
-
-
+ 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   //cin >> t; 
    while(t--){
        solve();
    }
+
+  // auto stop = high_resolution_clock::now(); 
+
+  // auto duration = duration_cast<microseconds>(stop - start); 
+  // cerr << "Time taken by function: "
+      //   << duration.count() << " microseconds" << endl; 
 }

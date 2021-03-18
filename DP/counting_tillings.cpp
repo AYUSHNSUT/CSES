@@ -34,95 +34,59 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
 
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
+int grid[11][1001];
+ll dp[11][1001];
+int mr , mc;
+ll solve(int row, int col){
+
+    if(dp[row][col])
+    if(row == 1){
+        if(col < mc )
+        {
+            grid[row][col] = 0;
+            dp[row][col]+= solve(row, col+2);
+        }
+
+        grid[row][col] = 1;
+        dp[row][col]+= solve(row , col+1);  
+
+        return dp[row][col];
+    }
+
+    else if(row == mr){
+
+         if(col < mc )
+        {
+            grid[row][col] = 0;
+            dp[row][col]+= solve(row, col+2);
+        }
+
+    }
 
 
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
-
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
+}
 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
+    int n, m;
+    cin >> n >> m;
 
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
+    if(n > m){
+        swap(n, m);
     }
-    ll dp[1000005];
+    mr = n;
+    mc = m;
 
-    memset(dp, 0 , sizeof(dp));
-
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
+    if(n<2 && m<2){
+        cout << 0 << endl;
+        return;
     }
 
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
+    memset(dp , 0 ,sizeof(dp));
 
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
+    cout << solve(1,1)%M << endl;
 
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
-    }
-
-    cout << dp[n*n - 1]%M << endl;
+    
 
 }
 
@@ -143,7 +107,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   // >> t; 
    while(t--){
        solve();
    }

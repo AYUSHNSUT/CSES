@@ -34,96 +34,33 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
-
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
-
-
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
-
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
+    int n;
+    cin>>n;
+    vi a(n);
 
     REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
+        cin >> a[i];
     }
-    ll dp[1000005];
 
-    memset(dp, 0 , sizeof(dp));
+    vi largestElementPerSize;
+    vi finalArr(n);
 
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
+    largestElementPerSize.pb(a[0]);
     for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
+        int elem = a[i];
+        auto it = lower_bound(all(largestElementPerSize),elem);
+
+        if(it ==largestElementPerSize.end()){
+            largestElementPerSize.pb(a[i]);
         }
         else{
-            dp[i] += dp[i-1];
+            *it = elem;
         }
     }
 
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
-
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
-    }
-
-    cout << dp[n*n - 1]%M << endl;
-
+    cout << largestElementPerSize.size() << "\n";
 }
 
 
@@ -143,7 +80,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   //cin >> t; 
    while(t--){
        solve();
    }

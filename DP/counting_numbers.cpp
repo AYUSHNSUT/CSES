@@ -34,96 +34,51 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
-
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
 
 
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
+ll dp[20][10][2][2];
+ll dpsolve(string num , int iter , int lastdigit, int leading_zeroes ,int tight){
+    if(iter == 0){
+        return 1;
+    }
 
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
+    if(dp[iter][lastdigit][leading_zeroes][tight] != -1){
+        return dp[iter][lastdigit][leading_zeroes][tight];
+    }
 
-    
+    int lower_bound_of_trying = 0;
+    int upper_bound_of_trying = tight == 0? 9 : num[num.size() - iter ] - '0';
+    ll tans = 0;
+    for(int i = lower_bound_of_trying ; i <= upper_bound_of_trying;i++){
+        if(i== lastdigit && !leading_zeroes ){
+            continue;
+        }
+        tans += dpsolve(num , iter - 1 , i , (i== 0 && leading_zeroes)? 1 : 0 , tight && (i == upper_bound_of_trying));
+    }
 
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
+      dp[iter][lastdigit][leading_zeroes][tight] = tans;
+      return dp[iter][lastdigit][leading_zeroes][tight];
 
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
+}
 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
+    ll a , b;
+    cin >> a >> b;
+    string A , B;
+    A = to_string(a-1);
+    B = to_string(b);
 
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
-    }
-    ll dp[1000005];
+   // cout << A << endl << B << endl;
+  //  cerr << dpsolve(B, B.size(), -1 , 1, 1) << endl;
+   // cerr << dpsolve(A, A.size(), -1 , 1, 1) << endl;
+   memset(dp , -1 ,sizeof(dp));
+   ll ans1 = dpsolve(B, B.size(), -1 , 1, 1);
+    memset(dp , -1 ,sizeof(dp));
+    ll ans2 =  dpsolve(A, A.size(), -1 , 1, 1) ;
 
-    memset(dp, 0 , sizeof(dp));
+    cout << ans1 - ans2 << endl;
 
-    dp[0] = a[0][0] == '.' ? 1 : 0;
-
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
-    }
-
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
-
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
-    }
-
-    cout << dp[n*n - 1]%M << endl;
-
+    
 }
 
 

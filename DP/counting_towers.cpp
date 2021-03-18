@@ -34,96 +34,50 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-// ll dp[1000006];
-// int N = 0;
-
-// ll find(ll n, vector <vector <char>> &a){
-//     ll row = n/N;
-//     ll col = n%N;
 
 
-//     if(a[row][col] == '*'){
-//         return 0;
-//     }
+ll dp[1000005][2];
 
-//     if(dp[n]!= 0){
-//         return dp[n]%M;
-//     }
-
-    
-
-//     if(row == 0){
-//         dp[n] +=  find(n-1,a)%M;
-//     }
-
-//     else if(col == 0){
-//         dp[n] +=  find(n-N,a)%M;
-//     }
-
-//     else{
-//         dp[n] += find(n-1,a)%M + find(n-N,a)%M;
-//     }
-
-
-//     // DEBUG(row);
-//     // DEBUG(col);
-//     // DEBUG(dp[n]);
-
-//     return dp[n]%M;
-    
-// }
+// to retreive answer instantly for already calculated n
+ map <ll , ll> ansz;
 
 void solve(){
-    ll n;
-    cin >> n;
-    vector <vector <char>> a(n , vector <char>(n));
-
-    REP(i,n){
-        REP(j,n){
-            cin >> a[i][j];
-        }
+    int n;
+    cin  >> n;
+    if(ansz[n]){
+        cout << ansz[n] << "\n";
+        return;
     }
-    ll dp[1000005];
+   // memset(dp , 0, sizeof(dp));
 
-    memset(dp, 0 , sizeof(dp));
+    dp[n+1][0] = 1;
+    dp[n+1][1] = 1;
 
-    dp[0] = a[0][0] == '.' ? 1 : 0;
+    for(int i = n;i>=2;i--){
+        // no extension on double tile
+        ll t1= (dp[i+1][0] + dp[i+1][1])%M;
+        // extension on double tile
+        ll t2 = dp[i+1][0];
 
-    for(int i = 1;i<n;i++){
-        if(a[0][i] == '*'){
-            dp[i] = 0;
-        }
-        else{
-            dp[i] += dp[i-1];
-        }
+        dp[i][0] = (t1 + t2)%M;
+        // 2 single tiles, no extenion
+        ll t3 = t1;
+
+        // 2 single tiles ,either 1 extensions;
+
+        ll t4 = (dp[i+1][1] + dp[i+1][1])%M;
+
+        // 2 single tiles , both extenstions
+
+        ll t5 = dp[i+1][1];
+
+        dp[i][1] = (t3 + t4 + t5)%M;
+        
     }
+    ll ans = (dp[2][0] + dp[2][1])%M;
 
-     for(int i = 1;i<n;i++){
-        if(a[i][0] == '*'){
-            dp[i*n] = 0;
-        }
-        else{
-            dp[i*n] += dp[i*n - n];
-        }
-    }
-
-    for(int row = 1;row<n;row++){
-        for(int col = 1;col < n;col++){
-
-            int point = row*n + col;
-            if(a[row][col] == '*'){
-                dp[point] = 0;
-            }
-            else{
-                dp[point]+=dp[(row-1)*n + col]%M + dp[row*n + col -1]%M;
-                dp[point] = dp[point]%M;
-            }
-            
-        }
-    }
-
-    cout << dp[n*n - 1]%M << endl;
-
+    cout << ans << "\n";
+    ansz[n] = ans;
 }
 
 
@@ -139,11 +93,11 @@ int main(){
     freopen("output.txt", "w", stdout);
     #endif
 
-
+   
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   cin >> t;
    while(t--){
        solve();
    }
