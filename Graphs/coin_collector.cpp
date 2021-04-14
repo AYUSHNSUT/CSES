@@ -34,17 +34,21 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
-
- vvl G;
-vvl iG;
-
-stack <ll> order;
-vector <ll> stronk;
+ll n , m;
+stack<ll>order;
+vvl G, iG;
+vl vis , ivis;
+vl costnodes;
+vvl SCC;
+vl  currSCC;
+vl scc_num;
+ll cost=0;
+ll scc_count = 0;
+vl costs;
+unordered_map<ll,ll> part_of_some_scc;
 void dfs(int n){
     vis[n] = 1;
-    // DEBUG(n);
+
     for(auto child : G[n]){
         if(!vis[child]){
             dfs(child);
@@ -55,72 +59,127 @@ void dfs(int n){
     vis[n] = 2;
 }
 
-
 void idfs(int n){
     ivis[n] = 1;
     // DEBUG(n);
     for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
+        if(!ivis[child]) idfs(child);
     }
-    stronk.pb(n);
-    ivis[n] = 2;
-}
-
-void solve(){
-    ll n , m;
-    cin >> n >> m;
 
    
-    vis.resize(n+1);
-    ivis.resize(n+1);
+    currSCC.pb(n);
+    ivis[n] = 2;
+}
+void solve(){
+    cin >> n >> m;
+
     G.resize(n+1);
     iG.resize(n+1);
+    costnodes.resize(n+1);
+    vis.resize(n+1);
+    ivis.resize(n+1);
+    scc_num.resize(n+1);
 
+    for(int i = 1;i<=n;i++){
+        cin >> costnodes[i];
+    }
     REP(i,m){
-        ll a , b;
-        cin >> a >> b;
+        ll a,b;
+        cin >> a >> b ;
         G[a].pb(b);
         iG[b].pb(a);
     }
 
-  
     for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
-        }
+        if(!vis[i]) dfs(i);
     }
 
-
-    ll num_comp = 0;
     while(!order.empty()){
         ll z = order.top();
         order.pop();
+        // DEBUG(z);
+        // DEBUG(ivis[z]);
 
-        if(!ivis[z]&&!num_comp){
+        if(!ivis[z]){
             idfs(z);
-            num_comp++;
-        }
-
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
+            SCC.pb(currSCC);
+            costs.pb(0);
+            for(auto elem : currSCC){
+                scc_num[elem] = scc_count;
+                part_of_some_scc[elem] = 1;
+                costs[scc_count]+=costnodes[elem];
             }
 
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
+            currSCC.clear();
+            scc_count++;
+        }
+    }
+
+    // for(auto scc : SCC){
+    //     for(auto nodes : scc){
+    //         DEBUG(nodes);
+    //     }
+    //     cerr << "\n********\n";
+    // }
+
+    ll N = SCC.size();
+    vl indegree(N);
+    vl outdegree(N);
+    vvl GS(N);
+    vvl iGS(N);
+
+    for(auto scc : SCC){
+        for(auto nodes:scc){
+            // DEBUG(nodes);
+            for(auto child: G[nodes]){
+                // DEBUG(child);
+                // DEBUG(scc_num[child]);
+                if(scc_num[child]!=scc_num[nodes]){
+                    GS[scc_num[nodes]].push_back(scc_num[child]);
+                    indegree[scc_num[child]]++;
+                    outdegree[scc_num[nodes]]++;
+                    iGS[scc_num[child]].pb(scc_num[nodes]);
                 }
             }
         }
     }
 
-    cout << "YES\n";
+    queue<int> q;
+    for(int i = 0;i<N;i++){
+        if(outdegree[i] == 0){
+            q.push(i);
+        }
+    }
+
+    vl dp(N);
+
+    while(!q.empty()){
+        int curr = q.front();
+        q.pop();
+
+        for(auto child : iGS[curr]){
+            if(!dp[child]){
+                dp[child] = costs[curr] + dp[curr];
+            }
+            else{
+                dp[child] = max(dp[child], costs[curr] + dp[curr]);
+            }
+            outdegree[child]--;
+            if(!outdegree[child]){
+                q.push(child);
+            }
+        }
+    }
+
+    ll maxx = -1;
+
+    for(int i  = 0;i<N;i++){
+        maxx = max(maxx, dp[i]+costs[i]);
+    }
+
+    cout << maxx << endl;
+
+
 
 
 }
@@ -142,7 +201,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+ //  cin >> t; 
    while(t--){
        solve();
    }

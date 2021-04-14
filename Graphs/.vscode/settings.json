@@ -31,6 +31,8 @@
         "typeindex": "cpp",
         "utility": "cpp",
         "valarray": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "string_view": "cpp",
+        "regex": "cpp"
     }
 }

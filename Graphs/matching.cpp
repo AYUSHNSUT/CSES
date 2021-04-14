@@ -34,95 +34,89 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
+ll n;
+ll get_flow_by_bfs(vvl &G, vvl &adj, vl&parent){
+    fill(parent.begin(), parent.end(),-1);
+    queue <pll> q;
+    q.push({0,M});
+    parent[0] = 0;
 
- vvl G;
-vvl iG;
+    while(!q.empty()){
+        pll currp = q.front();
+        q.pop();
+        ll curr = currp.first;
+        ll c_flow = currp.second;
+        // DEBUG(curr);
 
-stack <ll> order;
-vector <ll> stronk;
-void dfs(int n){
-    vis[n] = 1;
-    // DEBUG(n);
-    for(auto child : G[n]){
-        if(!vis[child]){
-            dfs(child);
+        for(auto child : adj[curr]){
+            if(parent[child]== -1 && G[curr][child]){
+                parent[child] = curr;
+                ll this_flow = G[curr][child];
+                this_flow = min(this_flow , c_flow);
+                if(child == n-1){
+                    return this_flow;
+                }
+                q.push({child , this_flow});
+            }
         }
     }
 
-    order.push(n);
-    vis[n] = 2;
+    return 0;
 }
-
-
-void idfs(int n){
-    ivis[n] = 1;
-    // DEBUG(n);
-    for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
-    }
-    stronk.pb(n);
-    ivis[n] = 2;
-}
-
 void solve(){
-    ll n , m;
-    cin >> n >> m;
-
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
-    G.resize(n+1);
-    iG.resize(n+1);
+    ll boys,girls,m;
+    cin >> boys >> girls >> m;
+    n = boys+girls+2;
+    vvl G(n);
+    vvl cap(n, vl(n));
 
     REP(i,m){
-        ll a , b;
+        ll a ,b;
         cin >> a >> b;
-        G[a].pb(b);
-        iG[b].pb(a);
+        if(cap[a][boys+b]) continue;
+        G[a].pb(boys + b);
+        G[boys+b].pb(a);
+        cap[a][boys+b] = 1;
     }
 
-  
-    for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
+    for(int i = 1;i<=boys;i++){
+        G[0].pb(i);
+        cap[0][i] = 1;
+    }
+     for(int i = boys+1;i<=boys+girls;i++){
+        G[i].pb(n-1);
+        cap[i][n-1] = 1;
+    }
+
+    ll new_flow;
+    ll tot_flow = 0;
+    vl parent(n);
+    while(new_flow = get_flow_by_bfs(cap,G,parent)){
+        tot_flow += new_flow;
+        // DEBUG(new_flow);
+        ll b = n-1;
+        ll a = parent[n-1];
+
+        while(true){
+            // DEBUG(a);
+            // DEBUG(b);
+            cap[a][b] -= new_flow;
+            cap[b][a] += new_flow;
+            if(a==0) break;
+            b = a;
+            a = parent[a];
         }
     }
 
+    cout << tot_flow << endl;
 
-    ll num_comp = 0;
-    while(!order.empty()){
-        ll z = order.top();
-        order.pop();
-
-        if(!ivis[z]&&!num_comp){
-            idfs(z);
-            num_comp++;
-        }
-
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
+    for(int i = 1;i<=boys;i++){
+        for(auto girl : G[i]){
+            if(cap[i][girl] == 0){
+                cout << i << " "<< girl - boys << "\n";
             }
-
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
-                }
-            }
         }
     }
-
-    cout << "YES\n";
-
-
 }
 
 
@@ -142,7 +136,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   //cin >> t; 
    while(t--){
        solve();
    }

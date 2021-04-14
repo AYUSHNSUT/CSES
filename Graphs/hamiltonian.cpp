@@ -34,95 +34,68 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
 
- vvl G;
-vvl iG;
-
-stack <ll> order;
-vector <ll> stronk;
-void dfs(int n){
-    vis[n] = 1;
-    // DEBUG(n);
-    for(auto child : G[n]){
-        if(!vis[child]){
-            dfs(child);
-        }
-    }
-
-    order.push(n);
-    vis[n] = 2;
+ll n , m;
+ll transform(ll x, ll y){
+    return x*n + y;
 }
-
-
-void idfs(int n){
-    ivis[n] = 1;
-    // DEBUG(n);
-    for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
-    }
-    stronk.pb(n);
-    ivis[n] = 2;
-}
-
 void solve(){
-    ll n , m;
     cin >> n >> m;
 
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
-    G.resize(n+1);
-    iG.resize(n+1);
+    vvl G(n);
+    vvl iG(n);
+
 
     REP(i,m){
         ll a , b;
         cin >> a >> b;
-        G[a].pb(b);
-        iG[b].pb(a);
+        G[a-1].pb(b-1);
+        iG[b-1].pb(a-1);
     }
 
-  
-    for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
+    vvl dp((1<<(n)), vl(n));
+    dp[1][0] = 1;
+    
+    for(int i = 1;i< 1 << (n);i+=2){
+        // DEBUG(i);
+        if(__builtin_popcount(i) == 1){
+            continue;
         }
-    }
-
-
-    ll num_comp = 0;
-    while(!order.empty()){
-        ll z = order.top();
-        order.pop();
-
-        if(!ivis[z]&&!num_comp){
-            idfs(z);
-            num_comp++;
+        if(i & (1 << (n-1)) && __builtin_popcount(i) != n){
+            continue;
         }
-
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
+        // string bini;
+        // bini = bitset<20>(i).to_string();
+        // DEBUG(bini);
+        for(int j = 1;j<n;j++){
+            if(j == n-1 && i!= (1<<n)-1){
+                continue;
             }
-
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
+            if(i & 1<<j){
+                // DEBUG(j);
+                ll previousiter = i^(1<<j);
+                // DEBUG(bitset<4>(previousiter).to_string());
+                //yaha
+                for(auto neighbours : iG[j]){
+                    if(neighbours == n-1){
+                        continue;
+                    }
+                    // DEBUG(neighbours);
+                    if(i & (1<<neighbours)){
+                        dp[i][j] += dp[previousiter][neighbours]%M;
+                        dp[i][j]%=M;
+                        // DEBUG(dp[i][j]);
+                    }
                 }
             }
         }
     }
+    
+    DEBUG((1<<n) - 1);
+    DEBUG(n-1);
+    cout << dp[(1<<n) - 1][n-1] << endl;
 
-    cout << "YES\n";
-
-
+    
 }
 
 

@@ -34,50 +34,46 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+vvl G;
+vvl iG;
+
 vl vis;
 vl ivis;
 
- vvl G;
-vvl iG;
-
+vl stronk;
 stack <ll> order;
-vector <ll> stronk;
+
+
 void dfs(int n){
     vis[n] = 1;
-    // DEBUG(n);
+
     for(auto child : G[n]){
-        if(!vis[child]){
-            dfs(child);
-        }
+        if(!vis[child]) dfs(child);
     }
 
     order.push(n);
     vis[n] = 2;
 }
 
-
 void idfs(int n){
     ivis[n] = 1;
-    // DEBUG(n);
+  //  DEBUG(n);
     for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
+ //       DEBUG(child);
+        if(!ivis[child]) idfs(child);
     }
     stronk.pb(n);
     ivis[n] = 2;
 }
-
 void solve(){
     ll n , m;
     cin >> n >> m;
 
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
     G.resize(n+1);
     iG.resize(n+1);
+
+    vis.resize(n+1);
+    ivis.resize(n+1);
 
     REP(i,m){
         ll a , b;
@@ -86,43 +82,32 @@ void solve(){
         iG[b].pb(a);
     }
 
-  
     for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
-        }
+        if(!vis[i]) dfs(i);
     }
 
-
-    ll num_comp = 0;
+    ll stronk_numbr = 1;
+    vl SCC(n+1);
     while(!order.empty()){
         ll z = order.top();
         order.pop();
 
-        if(!ivis[z]&&!num_comp){
+        if(!ivis[z]){
             idfs(z);
-            num_comp++;
-        }
 
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
+            for(auto st : stronk){
+                SCC[st] = stronk_numbr;
             }
 
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
-                }
-            }
+            stronk.clear();
+            stronk_numbr++;
         }
     }
 
-    cout << "YES\n";
-
-
+    cout << stronk_numbr-1 << endl;
+    for(ll i = 1;i<=n;i++){
+        cout << SCC[i] << " ";
+    }
 }
 
 
@@ -142,7 +127,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+//   / cin >> t; 
    while(t--){
        solve();
    }

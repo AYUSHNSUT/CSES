@@ -22,7 +22,7 @@ inline bool EQ(double a, double b) { return fabs(a-b) < 1e-9; }
 inline int two(int n) { return 1 << n; }
 inline int test(int n, int b) { return (n>>b)&1; }
 inline void set_bit(int & n, int b) { n |= two(b); }
-inline void unset_bit(int & n, int b) { n &= ~two(b); }
+inline void unset_bit(ll & n, ll b) { n &= ~two(b); }
 inline int last_bit(int n) { return n & (-n); }
 inline int ones(int n) { int res = 0; while(n && ++res) n-=n&(-n); return res; }
 template<class T> void chmax(T & a, const T & b) { a = max(a, b); }
@@ -34,95 +34,83 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
-
- vvl G;
-vvl iG;
-
-stack <ll> order;
-vector <ll> stronk;
-void dfs(int n){
-    vis[n] = 1;
-    // DEBUG(n);
-    for(auto child : G[n]){
-        if(!vis[child]){
-            dfs(child);
-        }
-    }
-
-    order.push(n);
-    vis[n] = 2;
-}
 
 
-void idfs(int n){
-    ivis[n] = 1;
-    // DEBUG(n);
-    for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
-    }
-    stronk.pb(n);
-    ivis[n] = 2;
-}
 
 void solve(){
-    ll n , m;
-    cin >> n >> m;
+    ll n;
+    cin >> n;
+    // DEBUG(n);
+    ll t = n-1;
 
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
-    G.resize(n+1);
-    iG.resize(n+1);
-
-    REP(i,m){
-        ll a , b;
-        cin >> a >> b;
-        G[a].pb(b);
-        iG[b].pb(a);
-    }
-
+    vector <vector <pll>> G(1<<t);
   
-    for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
+    for(int i = 0;i<1<<t;i++){
+        ll n1 = i & ~(1<<(t-1));
+        ll tempnode = n1 << 1;
+        // DEBUG(i);
+        // DEBUG(tempnode);
+        // DEBUG(tempnode+1);
+        G[i].pb({tempnode,0});
+        G[i].pb({tempnode+1,1});
+    }
+
+    string ans = "";
+
+    REP(i,t){
+        ans+='0';
+    }
+    // DEBUG(ans);
+
+    ll curr = 0;
+    vl curr_path;
+    curr_path.pb(curr);
+    vl final_circuit;
+
+    while(!curr_path.empty()){
+        // DEBUG(curr);
+          if(!G[curr].empty()){
+            curr_path.pb(curr);
+            ll next = G[curr].back().first;
+            // DEBUG(next);
+            // DEBUG(G[curr].back().second);
+            G[curr].pop_back();
+            curr = next;
+        }
+          else{
+            // cerr << "REMOVAL\n";
+            // DEBUG(curr);
+            final_circuit.pb(curr);
+            if(!curr_path.empty()){
+                curr = curr_path.back();
+                 curr_path.pop_back();
+            }
+            // cerr << "BACKTRACK " << curr<< "\n";
+            // for(auto k : final_circuit){
+            //     cerr << k << " ";
+            // }
         }
     }
 
+    reverse(all(final_circuit));
 
-    ll num_comp = 0;
-    while(!order.empty()){
-        ll z = order.top();
-        order.pop();
-
-        if(!ivis[z]&&!num_comp){
-            idfs(z);
-            num_comp++;
+    for(int i = 1;i<final_circuit.size();i+=1){
+        ll prev = final_circuit[i-1];
+        ll n1 = prev & ~(1<<(t-1));
+        ll tempnode = n1 << 1;
+        
+        if(tempnode == final_circuit[i]){
+            ans += "0";
+        }
+        else{
+            ans+="1";
         }
 
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
-            }
-
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
-                }
-            }
-        }
     }
 
-    cout << "YES\n";
+    cout << ans << endl;
 
-
+    
 }
 
 

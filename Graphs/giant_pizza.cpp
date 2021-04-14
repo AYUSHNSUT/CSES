@@ -34,14 +34,12 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
-
- vvl G;
-vvl iG;
-
+vl vis, ivis;
+vl stronk;
+vvl G, iG;
 stack <ll> order;
-vector <ll> stronk;
+ll n, m;
+
 void dfs(int n){
     vis[n] = 1;
     // DEBUG(n);
@@ -51,7 +49,7 @@ void dfs(int n){
         }
     }
 
-    order.push(n);
+    stronk.pb(n);
     vis[n] = 2;
 }
 
@@ -65,63 +63,116 @@ void idfs(int n){
             idfs(child);
         }
     }
-    stronk.pb(n);
+    
+    order.push(n);
     ivis[n] = 2;
 }
 
+ll complement_node(ll x){
+    return (x + m)%(2*m);
+}
+
 void solve(){
-    ll n , m;
+
+ 
     cin >> n >> m;
+    DEBUG(n);
+    DEBUG(m);
 
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
-    G.resize(n+1);
-    iG.resize(n+1);
+    G.resize(2*m);
+    iG.resize(2*m);
 
-    REP(i,m){
-        ll a , b;
-        cin >> a >> b;
-        G[a].pb(b);
-        iG[b].pb(a);
-    }
+    vis.resize(2*m);
+    ivis.resize(2*m);
 
-  
-    for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
+    vector <ll> done(2*m);
+    REP(i,n){
+        char s1,s2;
+        ll x1 , x2;
+        cin>> s1 >> x1 >> s2 >> x2;
+        x1--;
+        x2--;
+        // DEBUG(s1);
+        // DEBUG(s2);
+        
+        if(s1 == '-'){
+            x1 = complement_node(x1);
         }
+        if(s2 == '-'){
+            x2 = complement_node(x2);
+        }
+        //   DEBUG(x1);
+        // DEBUG(x2);
+        G[complement_node(x1)].pb(x2);
+        G[complement_node(x2)].pb(x1);
+
+        iG[x2].pb(complement_node(x1));
+        iG[x1].pb(complement_node(x2));
     }
 
+    //   REP(i,2*m){
+    //       DEBUG(i+1);
+    //     for(auto node : G[i]){
+    //         DEBUG(node+1);
+    //     }
 
-    ll num_comp = 0;
+    //     cerr <<"*******\n";
+    // }
+
+
+    for(int i = 1;i<2*m;i++){
+         if(!ivis[i]) idfs(i);
+    }
+    vvl strongly;
     while(!order.empty()){
         ll z = order.top();
+        // DEBUG(z+1);
         order.pop();
 
-        if(!ivis[z]&&!num_comp){
-            idfs(z);
-            num_comp++;
-        }
-
-        else if(!ivis[z] && num_comp){
+        if(!vis[z]){
+            dfs(z);
+            
             unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
-            }
 
+            // for(auto k: stronk){
+            //     DEBUG(k+1);
+            // }
+            // cerr << "\n***********\n";
             for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
+                hashh[k] = 1LL;
+                if(hashh[complement_node(k)]){
+                    cout << "IMPOSSIBLE\n";
                     return;
                 }
             }
+
+            strongly.pb(stronk);
+            stronk.clear();
         }
+       
     }
+     for(auto stronks : strongly){
+            for(auto node : stronks){
+                // DEBUG(node+1);
+                // DEBUG(complement_node(node)+1);
+                if(!done[node]){
+                        done[node] = 2;
+                        done[complement_node(node)] = 1;
+                }
+            }
+            // cerr << "\n***********\n";
+        }
 
-    cout << "YES\n";
-
+     for(ll i = 0;i<m;i++){
+        //  DEBUG(i);
+        //  DEBUG(done[i]);
+            if(done[i] == 2){
+                cout << "+ ";
+            }
+            else{
+                cout << "- ";
+            }
+        }
 
 }
 

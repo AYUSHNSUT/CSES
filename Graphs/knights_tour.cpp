@@ -34,94 +34,49 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
 
- vvl G;
-vvl iG;
-
-stack <ll> order;
-vector <ll> stronk;
-void dfs(int n){
-    vis[n] = 1;
-    // DEBUG(n);
-    for(auto child : G[n]){
-        if(!vis[child]){
-            dfs(child);
-        }
-    }
-
-    order.push(n);
-    vis[n] = 2;
+ll node(ll x , ll y){
+    return (x-1)*8 + y-1;
 }
 
+int dx[] = {1,2,2,1,-1,-2,-2,-1};
+int dy[] = {2,1,-1,-2,-2,-1,1,2};
 
-void idfs(int n){
-    ivis[n] = 1;
-    // DEBUG(n);
-    for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
-    }
-    stronk.pb(n);
-    ivis[n] = 2;
+bool isValid(ll x , ll y){
+    return x>=1 && x<=8 && y>=1 && y<=8;
 }
 
+void dfs(ll source, ll &found, vvl &G, vl &done, vl &path){
+    if(found == 64) return;
+
+    
+}
 void solve(){
-    ll n , m;
-    cin >> n >> m;
+    ll x , y;
+    cin >> x >> y;
 
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
-    G.resize(n+1);
-    iG.resize(n+1);
+    vvl G(64);
 
-    REP(i,m){
-        ll a , b;
-        cin >> a >> b;
-        G[a].pb(b);
-        iG[b].pb(a);
-    }
+    vl outdegree(64);
 
-  
-    for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
-        }
-    }
-
-
-    ll num_comp = 0;
-    while(!order.empty()){
-        ll z = order.top();
-        order.pop();
-
-        if(!ivis[z]&&!num_comp){
-            idfs(z);
-            num_comp++;
-        }
-
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
-            }
-
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
+    for(int xx = 1;xx<=8;xx++){
+        for(int yy = 1;yy<=8;yy++){
+            for(int i = 0;i<8;i++){
+                if(isValid(xx + dx[i], yy +dy[i])){
+                    G[node(xx,yy)].pb(node(xx + dx[i], yy +dy[i]));
+                    outdegree[node(xx,yy)]++;
                 }
             }
         }
     }
 
-    cout << "YES\n";
+    vl done(64);
+    ll start = node(x,y);
+    done[node(x,y)] = 1;
+    ll found = 1;
+    vl path;
 
+    dfs(start, found, G, done, path);
 
 }
 

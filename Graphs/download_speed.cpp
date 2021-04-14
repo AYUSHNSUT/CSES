@@ -34,95 +34,72 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-vl vis;
-vl ivis;
+ll n , m;
+ll get_flow_by_bfs(vvl &G, vvl &adj, vl&parent, vvl &flowgraph){
+    fill(parent.begin(), parent.end(),-1);
+    queue <pll> q;
+    vl visited(n+1);
+    q.push({1,M});
+    parent[1] = 1;
 
- vvl G;
-vvl iG;
+    while(!q.empty()){
+        pll currp = q.front();
+        q.pop();
+        ll curr = currp.first;
+        ll c_flow = currp.second;
+        // DEBUG(curr);
 
-stack <ll> order;
-vector <ll> stronk;
-void dfs(int n){
-    vis[n] = 1;
-    // DEBUG(n);
-    for(auto child : G[n]){
-        if(!vis[child]){
-            dfs(child);
+        for(auto child : adj[curr]){
+            if(parent[child]== -1 && (G[curr][child]+flowgraph[curr][child])){
+                parent[child] = curr;
+                ll this_flow = G[curr][child] + flowgraph[curr][child];
+                this_flow = min(this_flow , c_flow);
+                if(child == n){
+                    return this_flow;
+                }
+                q.push({child , this_flow});
+            }
         }
     }
 
-    order.push(n);
-    vis[n] = 2;
+    return 0;
 }
-
-
-void idfs(int n){
-    ivis[n] = 1;
-    // DEBUG(n);
-    for(auto child : iG[n]){
-        // DEBUG(child);
-        if(!ivis[child]){
-            idfs(child);
-        }
-    }
-    stronk.pb(n);
-    ivis[n] = 2;
-}
-
 void solve(){
-    ll n , m;
     cin >> n >> m;
 
-   
-    vis.resize(n+1);
-    ivis.resize(n+1);
-    G.resize(n+1);
-    iG.resize(n+1);
-
+    vvl G(n+1, vl(n+1));
+    vvl adjList(n+1);
+    vvl flowgraph(n+1, vl(n+1));
     REP(i,m){
         ll a , b;
         cin >> a >> b;
-        G[a].pb(b);
-        iG[b].pb(a);
+        ll c;
+        cin >> c;
+        G[a][b]+= c;
+        adjList[a].pb(b);
+        adjList[b].pb(a);
     }
+    ll new_flow;
+    ll tot_flow = 0;
+    vl parent(n+1);
+    while(new_flow = get_flow_by_bfs(G,adjList,parent,flowgraph)){
+        tot_flow += new_flow;
+        // DEBUG(new_flow);
+        ll b = n;
+        ll a = parent[n];
 
-  
-    for(int i = 1;i<=n;i++){
-        if(!vis[i]){
-            dfs(i);
+        while(true){
+            // DEBUG(a);
+            // DEBUG(b);
+            flowgraph[a][b] -= new_flow;
+            flowgraph[b][a] += new_flow;
+            if(a==1) break;
+            b = a;
+            a = parent[a];
         }
     }
 
-
-    ll num_comp = 0;
-    while(!order.empty()){
-        ll z = order.top();
-        order.pop();
-
-        if(!ivis[z]&&!num_comp){
-            idfs(z);
-            num_comp++;
-        }
-
-        else if(!ivis[z] && num_comp){
-            unordered_map <ll,ll> hashh;
-            for(auto child : G[z]){
-                hashh[child] = 1;
-            }
-
-            for(auto k : stronk){
-                if(!hashh[k]){
-                    cout << "NO\n";
-                    cout << z << " " << k << "\n";
-                    return;
-                }
-            }
-        }
-    }
-
-    cout << "YES\n";
-
-
+    cout << tot_flow << endl;
 }
 
 
@@ -142,7 +119,7 @@ int main(){
 
    fast_cin();
    int t =1;
-  // cin >> t; 
+   //cin >> t; 
    while(t--){
        solve();
    }
