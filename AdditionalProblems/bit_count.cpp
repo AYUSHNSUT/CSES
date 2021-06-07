@@ -91,27 +91,16 @@ void solve(){
             ans += n%(1LL << j);    
         }
     }
-
     cout << ans << endl;
     return;
-
 }
-
-
-
 int main(){
-
-
-
     #ifdef mishrable
     // for getting input from input.txt
     freopen("input.txt", "r", stdin);
     // for writing output to output.txt
     freopen("output.txt", "w", stdout);
     #endif
-
-
-
    fast_cin();
    int t =1;
   // cin >> t; 

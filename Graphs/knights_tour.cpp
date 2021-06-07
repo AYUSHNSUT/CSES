@@ -38,22 +38,55 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 ll node(ll x , ll y){
     return (x-1)*8 + y-1;
 }
-
+ll lastnode;
 int dx[] = {1,2,2,1,-1,-2,-2,-1};
 int dy[] = {2,1,-1,-2,-2,-1,1,2};
 
 bool isValid(ll x , ll y){
     return x>=1 && x<=8 && y>=1 && y<=8;
 }
+ll chooseNode(ll source, vvl &G, vl &done, vl &outdegree, vl &tried){
+    pll index_value = {-1,M};
 
-void dfs(ll source, ll &found, vvl &G, vl &done, vl &path){
+    for(int i = 0;i<G[source].size();i++){
+        ll noad = G[source][i];
+        if(outdegree[noad]<index_value.second && !done[noad] && !tried[noad]){
+            index_value = {noad, outdegree[noad]};
+        }
+    }
+    if(index_value.first != -1){
+        tried[index_value.first] = 1;
+    }
+    return index_value.first;
+}
+
+void dfs(ll source, ll &found, vvl &G, vl &visited, vl &parent, vl &outdegree){
+    // cout << source << " " << found << "\n******\n";
+    found++;
+    lastnode = source;
     if(found == 64) return;
+    visited[source] = 1;
+    vl tried(64);
+    ll chosen = 65;
 
-    
+    while(found <=64){
+        chosen = chooseNode(source,G,visited,outdegree,tried);
+        if(chosen== -1 || found == 64){
+            break;
+        }
+        parent[chosen] = source;
+        dfs(chosen, found, G, visited, parent, outdegree);
+    }
+    if(found!=64)
+    {
+        visited[source] = 0;
+        found--;
+    }
 }
 void solve(){
     ll x , y;
-    cin >> x >> y;
+    cin >> y >> x;
+    DEBUG(node(x,y));
 
     vvl G(64);
 
@@ -72,12 +105,38 @@ void solve(){
 
     vl done(64);
     ll start = node(x,y);
-    done[node(x,y)] = 1;
-    ll found = 1;
-    vl path;
+    ll found = 0;
+    vl path(64);
 
-    dfs(start, found, G, done, path);
+    dfs(start, found, G, done, path,outdegree);
+    DEBUG(lastnode);
+    ll curr = lastnode;
+    vl allnodes;
+    while(true){
+        // DEBUG(curr);
+        // DEBUG(path[curr]);
+        allnodes.pb(curr);
+        if(curr == node(x,y))
+        break;
+        curr = path[curr];
+    }
 
+    reverse(all(allnodes));
+    vvl board(8, vl(8));
+    ll fnd = 1;
+    for(int i = 0;i<allnodes.size();i++){
+        ll tx,ty;
+        tx = allnodes[i]/8;
+        ty = allnodes[i]%8;
+        board[tx][ty] = fnd++;
+    }
+
+    for(int i = 0;i<8;i++){
+        for(int j = 0;j<8;j++){
+            cout << board[i][j] << " ";
+        }
+        cout << "\n";
+    }
 }
 
 

@@ -35,58 +35,8 @@ template<class T> void chmin(T & a, const T & b) { a = min(a, b); }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-int grid[11][1001];
-ll dp[11][1001];
-int mr , mc;
-ll solve(int row, int col){
-
-    if(dp[row][col])
-    if(row == 1){
-        if(col < mc )
-        {
-            grid[row][col] = 0;
-            dp[row][col]+= solve(row, col+2);
-        }
-
-        grid[row][col] = 1;
-        dp[row][col]+= solve(row , col+1);  
-
-        return dp[row][col];
-    }
-
-    else if(row == mr){
-
-         if(col < mc )
-        {
-            grid[row][col] = 0;
-            dp[row][col]+= solve(row, col+2);
-        }
-
-    }
-
-
-}
 
 void solve(){
-    int n, m;
-    cin >> n >> m;
-
-    if(n > m){
-        swap(n, m);
-    }
-    mr = n;
-    mc = m;
-
-    if(n<2 && m<2){
-        cout << 0 << endl;
-        return;
-    }
-
-    memset(dp , 0 ,sizeof(dp));
-
-    cout << solve(1,1)%M << endl;
-
-    
 
 }
 
@@ -107,8 +57,8 @@ int main(){
 
    fast_cin();
    int t =1;
-   // >> t; 
+   cin >> t; 
    while(t--){
        solve();
    }
-}
+} 

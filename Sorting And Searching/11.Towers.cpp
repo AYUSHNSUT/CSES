@@ -1,16 +1,16 @@
 #include<bits/stdc++.h>
-
+ 
 using namespace std;
-
+ 
 #define DEBUG(x) cerr << '>' << #x << ':' << x << endl;
 #define REP(i,n) for(int i=0;i<(n);i++)
 #define FOR(i,a,b) for(int i=(a);i<=(b);i++)
 #define FORD(i,a,b) for(int i=(a);i>=(b);i--)
 #define all(c) c.begin(),c.end()
-
+ 
 #define M 1000000007
-
-
+ 
+ 
 typedef long long ll;
 typedef unsigned long long ull;
 typedef pair<int, int> pii;
@@ -21,10 +21,10 @@ typedef vector<vi> vvi;
 typedef vector<pii> vii;
 typedef vector<ll> vl;
 typedef vector<vl> vvl;
-
+ 
 #define mp make_pair
 #define pb push_back
-
+ 
 inline bool EQ(double a, double b) { return fabs(a-b) < 1e-9; }
 const int INF = 1<<29;
 inline int two(int n) { return 1 << n; }
@@ -40,43 +40,43 @@ void solve()
 {
   int n;
   cin >> n;
-
+ 
   vi a;
-
+ 
   REP(i,n)
   {
     int tmp;
     cin >> tmp;
-
+ 
     if(a.empty() || tmp >= a[a.size()-1])
     {
       a.pb(tmp);
     }
-
+ 
     else{
       auto searchindex = upper_bound(all(a), tmp) - a.begin();
       a[searchindex] = tmp;
     }
   }
-
+ 
   cout << a.size() << endl;
 }
-
+ 
 int main()
 {
-
+ 
     std::ios::sync_with_stdio(false);
     int t = 1;
     //cin >> t;
-
+ 
     while(t--)
       {
         solve();
       }
-
-
-
-
+ 
+ 
+ 
+ 
 //fout.close();
 //fin.close();
     return 0;
